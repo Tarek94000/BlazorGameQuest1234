@@ -1,0 +1,36 @@
+@* V1 : composant PUREMENT statique (pas de logique métier) *@
+<div class="room-card" style="border:1px solid #ddd; padding:1rem; border-radius:0.5rem; max-width:420px;">
+    <h3>Salle 1</h3>
+    <p>Un gobelin apparaît. Que faites-vous ?</p>
+
+    <div style="display:flex; gap:0.5rem;"class="actions">
+        <button @onclick="OnFight">Combattre</button>
+        <button @onclick="OnSearch">Fouiller</button>
+        <button @onclick="OnRun">Fuir</button>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(_lastAction))
+    {
+        <p style="margin-top:0.5rem;"><em>Action cliquée :</em> @_lastAction</p>
+    }
+</div>
+
+@code {
+    private string _lastAction = string.Empty;
+
+    void OnFight()
+    {
+        _lastAction = "Combattre";
+        Console.WriteLine("Action: Combattre"); // juste une trace V1
+    }
+    void OnSearch()
+    {
+        _lastAction = "Fouiller";
+        Console.WriteLine("Action: Fouiller");
+    }
+    void OnRun()
+    {
+        _lastAction = "Fuir";
+        Console.WriteLine("Action: Fuir");
+    }
+}

@@ -1,0 +1,58 @@
+/* Disposition générale (sidebar + contenu) */
+.page[b-7u0urdf5km] {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  background: #f6f7fb;
+}
+
+/* Barre latérale */
+.sidebar[b-7u0urdf5km] {
+  background: #0f172a;          /* bleu nuit */
+  color: #e5e7eb;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;                 /* sidebar pleine hauteur */
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0,0,0,.08);
+}
+
+.brand[b-7u0urdf5km] {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: .3px;
+}
+
+/* Zone contenu */
+.content[b-7u0urdf5km] {
+  padding: 1.5rem;
+}
+
+.container[b-7u0urdf5km] {
+  max-width: 1000px;
+  margin-inline: auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.25rem 1.25rem 2rem;
+  box-shadow: 0 6px 24px rgba(0,0,0,.06);
+}
+
+/* Titres/espacements (un peu de cohérence visuelle) */
+.container h1[b-7u0urdf5km], .container h2[b-7u0urdf5km], .container h3[b-7u0urdf5km] { margin-top: 0; }
+.container p[b-7u0urdf5km] { line-height: 1.55; color: #374151; }
+
+/* Responsive : sous 860px on passe en layout vertical */
+@media (max-width: 860px) {
+  .page[b-7u0urdf5km] { grid-template-columns: 1fr; }
+  .sidebar[b-7u0urdf5km] {
+    height: auto;
+    position: static;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+  }
+  .content[b-7u0urdf5km] { padding: 1rem; }
+  .container[b-7u0urdf5km] { border-radius: 10px; padding: 1rem; }
+}
