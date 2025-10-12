@@ -1,8 +1,7 @@
 # 🕹️ BlazorGameQuest
 
 **Projet en continu – Développement Agile (.NET & C# / Efrei 2025-2026)**  
-Cours : *Environnement .NET et C# (ALTN71)*  
-Enseignant : **Thierry TAGNE**
+Cours : *Environnement .NET et C# (ALTN71)*
 
 ---
 
