@@ -1,8 +1,0 @@
-.back[b-uymtgvaznb]{
-  padding:.5rem .8rem; border-radius:.55rem; cursor:pointer;
-  font-weight:900; letter-spacing:.5px;
-  background: linear-gradient(180deg, #ef4444, #dc2626);
-  border:1px solid #991b1b; color:#fff; text-shadow:0 1px 0 rgba(0,0,0,.35);
-}
-.back:hover[b-uymtgvaznb]{ transform: translateY(-1px); }
-.fixed-top-right[b-uymtgvaznb]{ position:fixed; top:16px; right:16px; z-index:1100; }
