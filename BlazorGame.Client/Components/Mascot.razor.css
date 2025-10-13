@@ -1,0 +1,5 @@
+.mascot{ position:relative; }
+.mascot .svg{ filter: drop-shadow(0 12px 30px rgba(0,0,0,.45)); }
+.size-sm .svg{ width:96px; }
+.size-md .svg{ width:180px; }
+.size-lg .svg{ width:min(320px, 70vw); }

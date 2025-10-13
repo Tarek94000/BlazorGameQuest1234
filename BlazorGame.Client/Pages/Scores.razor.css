@@ -1,0 +1,10 @@
+.page-canvas{
+  position: relative;
+  width: min(1100px, 96%);
+  margin-inline: auto;
+  background: #ffffff; color:#111827;
+  border-radius: 16px; padding: 1.25rem 1.25rem 2rem;
+  box-shadow: 0 18px 60px rgba(0,0,0,.18);
+}
+.btn-corner{ position:absolute; top:14px; right:14px; }
+.scores-box{ border:1px solid #e5e7eb; border-radius:12px; padding:1rem; background:#fff; }

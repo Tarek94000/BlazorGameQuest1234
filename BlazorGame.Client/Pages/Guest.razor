@@ -1,0 +1,45 @@
+@page "/guest"
+@using BlazorGame.Client.Components
+@inject NavigationManager Nav
+
+<PageTitle>Mode Invité</PageTitle>
+
+<div class="home-canvas">
+  <div class="panel">
+
+    <!-- En-tête du panneau : logo + avatar top-right -->
+    <div class="panel-header">
+      <h1 class="logo">BLAZOR<br/>QUEST</h1>
+      <div class="avatar">
+        <Mascot Variant="@Selected" Size="sm" />
+      </div>
+    </div>
+
+    <!-- Sélecteur en liste déroulante -->
+    <div class="selector">
+      <label for="role">Personnage</label>
+      <select id="role" @bind="Selected">
+        <option value="devil">Diablotin</option>
+        <option value="knight">Chevalier</option>
+        <option value="mage">Mage</option>
+        <option value="rogue">Voleur</option>
+      </select>
+    </div>
+
+    <!-- Menu principal invité : pas de "Continuer" -->
+    <nav class="menu-col">
+      <a class="item primary" href="/play?from=guest">▶️  Nouvelle partie</a>
+      <button class="item" @onclick="() => ShowRules = true">📜  Règles du jeu</button>
+      <a class="item" href="/scores">🏆  Scores</a>
+      <a class="item" href="/admin">🛠️  Admin</a>
+    </nav>
+  </div>
+</div>
+
+<!-- Panneau des règles -->
+<RulesPanel IsOpen="@ShowRules" OnClose="() => ShowRules = false" />
+
+@code {
+  private string Selected { get; set; } = "devil";
+  private bool ShowRules;
+}

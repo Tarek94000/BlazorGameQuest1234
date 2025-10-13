@@ -1,0 +1,31 @@
+@* Variant: "devil" | "knight" | "mage" | "rogue" ; Size: "sm"|"md"|"lg" *@
+<div class="mascot @($"size-{Size}")">
+  <svg viewBox="0 0 220 260" class="svg">
+    @{
+      var head   = Variant switch { "knight" => "#c7d2fe", "mage" => "#8b5cf6", "rogue" => "#94a3b8", _ => "#e25b5b" };
+      var torso  = Variant switch { "knight" => "#1f2937", "mage" => "#312e81", "rogue" => "#111827", _ => "#222733" };
+      var tunic  = Variant switch { "knight" => "#60a5fa", "mage" => "#f59e0b", "rogue" => "#10b981", _ => "#f1c34e" };
+      var accent = Variant switch { "knight" => "#3b82f6", "mage" => "#a78bfa", "rogue" => "#22c55e", _ => "#e25b2a" };
+    }
+    <ellipse cx="110" cy="90" rx="70" ry="55" fill="@head" />
+    <path d="M40,90 L95,80 L180,95" stroke="#111" stroke-width="16" fill="none" stroke-linecap="round"/>
+    <rect x="78" y="72" width="20" height="18" fill="#fff" opacity=".8" />
+    <g transform="translate(150,60) rotate(20)">
+      <rect x="-18" y="-6" width="36" height="12" rx="4" fill="#f3cc7a"/>
+      <rect x="-6" y="-18" width="12" height="36" rx="4" fill="#f3cc7a"/>
+    </g>
+    <path d="M50,65 Q40,40 60,45 Q60,60 50,65" fill="#d54a4a"/>
+    <path d="M170,70 Q180,45 160,50 Q160,65 170,70" fill="#d54a4a"/>
+    <path d="M60,140 L160,140 L175,220 L45,220 Z" fill="@torso"/>
+    <path d="M85,140 L135,140 L135,205 L85,205 Z" fill="@tunic"/>
+    <path d="M90,205 L75,240 L45,240 L65,205 Z" fill="@accent"/>
+    <path d="M130,205 L145,240 L175,240 L155,205 Z" fill="@accent"/>
+    <ellipse cx="55" cy="245" rx="28" ry="12" fill="#caa042"/>
+    <ellipse cx="165" cy="245" rx="28" ry="12" fill="#caa042"/>
+  </svg>
+</div>
+
+@code {
+  [Parameter] public string Variant { get; set; } = "devil";
+  [Parameter] public string Size { get; set; } = "lg";
+}

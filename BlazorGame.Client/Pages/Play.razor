@@ -1,6 +1,43 @@
 @page "/play"
+@using BlazorGame.Client.Components
+@inject NavigationManager Nav
 
-<h2>Nouvelle aventure</h2>
-<p>(V1) Ici s’affichera la progression. Pour l’instant, on montre UNE salle statique :</p>
+<div class="game-canvas">
+  <BackButton Target="@BackTarget" CssClass="btn-corner" />
 
-<RoomView />
+  <h1>Nouvelle aventure</h1>
+  <p class="lead">(V1) Ici s’affichera la progression. Pour l’instant, on montre UNE salle statique :</p>
+
+  <div class="room-wrap">
+    <RoomView />
+  </div>
+</div>
+
+@code {
+  private string BackTarget = "/"; // défaut : retour au menu principal
+
+  protected override void OnInitialized()
+  {
+    // Ex: /play?from=guest  -> retour vers /guest
+    var uri = new Uri(Nav.Uri);
+    var query = uri.Query; // "?from=guest"
+
+    if (!string.IsNullOrEmpty(query))
+    {
+      var parts = query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries);
+      foreach (var p in parts)
+      {
+        var kv = p.Split('=', 2);
+        if (kv.Length >= 1 && string.Equals(kv[0], "from", StringComparison.OrdinalIgnoreCase))
+        {
+          var value = kv.Length == 2 ? Uri.UnescapeDataString(kv[1]) : string.Empty;
+          if (string.Equals(value, "guest", StringComparison.OrdinalIgnoreCase))
+          {
+            BackTarget = "/guest";
+          }
+          break;
+        }
+      }
+    }
+  }
+}
