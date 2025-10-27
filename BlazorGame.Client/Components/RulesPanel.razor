@@ -1,0 +1,29 @@
+@if (IsOpen)
+{
+  <div class="backdrop" @onclick="Close">
+    <div class="panel" @onclick:stopPropagation="true">
+      <div class="panel-header">
+        <h3>📜 Règles — Version 1</h3>
+        <button class="close" @onclick="Close" aria-label="Fermer">✖</button>
+      </div>
+
+      <div class="panel-body">
+        <ul>
+          <li>Partie statique : une salle affichée, sans logique métier.</li>
+          <li>Actions possibles : <b>Combattre</b>, <b>Fouiller</b>, <b>Fuir</b>.</li>
+          <li>V2 : génération aléatoire, score, persistance.</li>
+        </ul>
+      </div>
+
+      <div class="panel-footer">
+        <button class="ok" @onclick="Close">OK</button>
+      </div>
+    </div>
+  </div>
+}
+
+@code {
+  [Parameter] public bool IsOpen { get; set; }
+  [Parameter] public EventCallback OnClose { get; set; }
+  void Close() => OnClose.InvokeAsync();
+}

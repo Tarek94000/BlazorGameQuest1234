@@ -1,0 +1,20 @@
+.backdrop{
+  position:fixed; inset:0; background:rgba(3,6,20,.55); backdrop-filter:blur(3px);
+  display:grid; place-items:center; z-index:1000;
+}
+.panel{
+  width:min(640px, 92%); background:#fff; color:#111827; border-radius:16px;
+  border:1px solid #e5e7eb; box-shadow:0 18px 60px rgba(0,0,0,.35);
+  overflow:hidden; display:flex; flex-direction:column;
+}
+.panel-header{ display:flex; align-items:center; justify-content:space-between; padding:.8rem 1rem; background:#f9fafb; }
+.panel-body{ padding:1rem; }
+.panel-footer{ padding:.8rem 1rem; display:flex; justify-content:flex-end; gap:.5rem; background:#f9fafb; }
+
+.close{
+  background:transparent; border:1px solid #d1d5db; border-radius:.5rem; padding:.25rem .5rem; cursor:pointer;
+}
+.ok{
+  background:linear-gradient(180deg,#3b82f6,#2563eb); color:#fff; border:1px solid #1d4ed8; border-radius:.6rem;
+  padding:.45rem .8rem; cursor:pointer; font-weight:700;
+}

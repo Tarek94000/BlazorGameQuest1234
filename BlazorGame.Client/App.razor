@@ -1,0 +1,13 @@
+﻿@using BlazorGame.Client.Layout
+
+<Router AppAssembly="@typeof(App).Assembly">
+  <Found Context="routeData">
+    <RouteView RouteData="@routeData" DefaultLayout="@typeof(CanvasLayout)" />
+    <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+  </Found>
+  <NotFound>
+    <LayoutView Layout="@typeof(CanvasLayout)">
+      <p>Page introuvable.</p>
+    </LayoutView>
+  </NotFound>
+</Router>

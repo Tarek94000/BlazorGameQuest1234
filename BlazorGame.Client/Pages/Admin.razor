@@ -1,0 +1,27 @@
+﻿@page "/admin"
+@using BlazorGame.Client.Components
+
+<div class="page-canvas">
+  <BackButton Target="/" CssClass="btn-corner" />
+
+  <h1>Tableau de bord Admin</h1>
+  <p class="muted">(V1) UI seulement — logique/secure à venir (Keycloak, rôles…)</p>
+
+  <section class="kpi">
+    <div class="card kpi-card"><div class="kpi-value">0</div><div class="kpi-label">Joueurs</div></div>
+    <div class="card kpi-card"><div class="kpi-value">0</div><div class="kpi-label">Parties</div></div>
+    <div class="card kpi-card"><div class="kpi-value">0</div><div class="kpi-label">Scores</div></div>
+    <div class="card kpi-card"><div class="kpi-value">0</div><div class="kpi-label">Évènements</div></div>
+  </section>
+
+  <section class="grid-2">
+    <div class="card">
+      <h3>Joueurs</h3>
+      <p class="muted">Liste à venir…</p>
+    </div>
+    <div class="card">
+      <h3>Historique général</h3>
+      <p class="muted">Journal des parties…</p>
+    </div>
+  </section>
+</div>

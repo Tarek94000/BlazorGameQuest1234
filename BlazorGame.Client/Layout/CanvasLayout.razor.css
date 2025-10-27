@@ -1,0 +1,40 @@
+:root{
+  --text:#e5e7eb;            /* texte clair sur fond sombre */
+  --bg-slab:#0f172a;         /* bleu-gris très foncé */
+  --stone:#111827;           /* pierre sombre */
+  --line:#1f2937;            /* joints des pierres */
+}
+*{ box-sizing:border-box; }
+html, body { height:100%; margin:0; color:var(--text); }
+
+/* Fond "mur de pierre" sombre */
+body{
+  background:
+    /* grille principale */
+    linear-gradient(var(--line) 1px, transparent 1px) 0 0/60px 30px,
+    linear-gradient(to right, var(--line) 1px, transparent 1px) 0 0/60px 30px,
+    /* décalage pour effet briques */
+    linear-gradient(var(--line) 1px, transparent 1px) 30px 15px/60px 30px,
+    linear-gradient(to right, var(--line) 1px, transparent 1px) 30px 15px/60px 30px,
+    var(--stone);
+  background-attachment: fixed;
+}
+
+/* Légère vignette pour la profondeur */
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none;
+  background:
+    radial-gradient(1000px 500px at 50% 20%, rgba(255,255,255,.06), transparent 60%),
+    radial-gradient(900px 450px at 70% 80%, rgba(0,0,0,.25), transparent 60%);
+  mix-blend-mode:overlay; opacity:.9;
+}
+
+/* Conteneur centré (les "cartes" blanches du site) */
+.viewport{
+  min-height:100vh; display:grid; place-items:center; padding:2rem 1rem;
+  background: linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.18)); /* léger voile */
+}
+.content-wrap{ width:min(1200px, 100%); margin-inline:auto; }
+
+/* (optionnel) les cartes internes restent blanches pour le contraste :
+   si tu veux un thème full dark, on pourra foncer .start-canvas/.home-canvas aussi. */

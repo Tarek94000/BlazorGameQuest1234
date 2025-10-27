@@ -1,0 +1,29 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Ajouter les services nécessaires
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AuthenticationServices API", Version = "v1" });
+});
+
+var app = builder.Build();
+
+// Activer Swagger si tu veux tester dans le navigateur
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+
+// Active les routes des contrôleurs
+app.MapControllers();
+
+app.Run();
