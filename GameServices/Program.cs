@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 using GameService.Data;
 using GameServices.Services;
 using Microsoft.EntityFrameworkCore;
@@ -55,5 +56,14 @@ app.UseSwaggerUI();
 app.UseCors("AllowBlazorClient");
 
 app.MapControllers();
+=======
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
+
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+app.MapGet("/health", () => "ok"); //verification que le service tourne
+>>>>>>> origin/prod
 
 app.Run();

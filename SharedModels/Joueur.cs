@@ -2,6 +2,7 @@ namespace SharedModels;
 
 public class Joueur
 {
+<<<<<<< HEAD
     public int Id { get; set; }
     public string Nom { get; set; } = "";
     public int Score { get; set; } = 0;
@@ -10,4 +11,8 @@ public class Joueur
 
     // Historique des parties
     public List<Partie>? HistoriqueParties { get; set; }
+=======
+    public string Nom { get; set; } = "";
+    public int Score { get; set; } = 0;
+>>>>>>> origin/prod
 }
