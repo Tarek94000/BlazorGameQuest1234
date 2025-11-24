@@ -1,154 +1,170 @@
-# 📦 Version 2 – Modélisation et Base de Données
 
-## 🎯 Objectif de la V2
-Mettre en place la **modélisation du domaine** et une **base de données fonctionnelle** avec **Entity Framework Core (InMemory)**.  
-Cette version introduit les entités principales du jeu (Joueur, Donjon, Salle, Partie, Administrateur) et expose leurs **endpoints CRUD** via une API REST testable dans Swagger.
+# 📘 BlazorGameQuest – Version 3  
+**Binôme : EL MISSIRY Tarek & KHAN Ibrahim**
 
----
+## 🎯 Objectif de la Version 3  
+La V3 porte sur **le déroulement complet d’une partie** avec :
 
-## 🧱 Architecture mise à jour
+- Génération aléatoire d’un/plusieurs donjons  
+- Interface de jeu interactive via Blazor  
+- Choix dans les salles  
+- Calcul dynamique du score  
+- Sauvegarde de la partie  
+- Tests unitaires enrichis  
+- Mesure de la couverture de code  
+
+Cette version combine le **backend (API .NET)** et le **frontend (Blazor WebAssembly)**.
+
+# 🏗️ Architecture du projet
 
 ```
 BlazorGameQuest1234/
-├── BlazorGame.Client/            # Interface Blazor WebAssembly
 │
-├── GameServices/                 # Web API (.NET 9 / EFCore)
+├── BlazorGame.Client/            → Frontend Blazor WebAssembly
+│   ├── Pages/
+│   │   ├── Play.razor            → Page de jeu interactive (V3)
+│   ├── Models/
+│   │   ├── GameState.cs
+│   │   ├── SalleDto.cs
+│   │   ├── ChoiceRequest.cs
+│   └── Program.cs                → HttpClient configuré pour API
+│
+├── GameServices/                 → Backend API logique du jeu
 │   ├── Controllers/
-│   │   ├── JoueursController.cs
-│   │   ├── DonjonsController.cs
-│   │   ├── SallesController.cs
-│   │   └── PartiesController.cs
+│   │   ├── GameController.cs     → API jeu (start, state, choice)
+│   ├── Services/
+│   │   └── GameLogicService.cs   → Logique métier V3
 │   ├── Data/
-│   │   └── GameDbContext.cs
-│   └── Program.cs                # Configuration EFCore + Swagger
+│   │   └── GameDbContext.cs      → Base EF InMemory
+│   └── Program.cs                → Swagger, CORS, seed invité
 │
-├── SharedModels/                 # Bibliothèque de classes partagées
+├── SharedModels/                 → Modèles partagés (entités)
 │   ├── Joueur.cs
-│   ├── Administrateur.cs
 │   ├── Donjon.cs
 │   ├── Salle.cs
 │   ├── Partie.cs
-│   └── RoomType.cs
+│   ├── RoomType.cs
 │
-├── Tests/                        # Tests unitaires (xUnit)
-│   ├── JoueurTests.cs
-│   └── DbContextTests.cs
-│
-└── README.md
+└── Tests/                        → Tests unitaires (xUnit)
+    ├── GameLogicTests.cs
+    ├── DbContextTests.cs
+    ├── JoueurTests.cs
 ```
 
----
+# 🧠 Fonctionnalités implémentées en V3
 
-## ⚙️ Fonctionnalités implémentées
+## Génération aléatoire du donjon  
+Dans `GameLogicService` :
 
-- ✅ **Entity Framework Core (InMemory)** configuré  
-- ✅ **DbContext** central (`GameDbContext`) avec toutes les entités  
-- ✅ **API CRUD** :  
-  - `api/joueurs`  
-  - `api/donjons`  
-  - `api/salles`  
-  - `api/parties`
-- ✅ **Swagger** activé (`http://localhost:5297/swagger`)  
-- ✅ **Tests unitaires** de validation des modèles et du contexte  
-- ✅ **Projet compilable et exécutable sans erreur**
+- Entre **1 et 5 salles aléatoires**
+- Description dynamique selon le type (`Enemy`, `Chest`, `Trap`, etc.)
+- Points gagnés/perdus aléatoires  
+- Difficulté aléatoire
 
----
+## Interface de jeu interactive  
+Dans `Play.razor` :
 
-## 🧪 Exécution et test
+- Affichage de la salle courante  
+- Score courant  
+- Choix interactifs :  
+  - **Combattre**  
+  - **Fuir**  
+  - **Fouiller**  
+- Mise à jour de l’état via API  
+- Affichage fin de partie + score final  
 
-### ▶️ Lancer l’API
-```bash
-dotnet run --project .\GameServices\
+L’UI utilise :  
+`POST /api/game/start?joueurId=1`  
+`GET /api/game/{partieId}`  
+`POST /api/game/{partieId}/choice`  
+
+## Calcul du score  
+Dans `GameLogicService.AppliquerChoixAsync` :
+
+- Combattre → gros gain/perte avec probabilité  
+- Fuir → petit gain  
+- Fouiller → trésor/piège  
+- Score négatif = mort immédiate  
+- Index de salle incrémenté  
+- Fin de donjon = partie terminée  
+
+## Sauvegarde de la partie  
+Chaque action appelle :
+
+`await _context.SaveChangesAsync();`
+
+Données conservées :
+
+- Date début  
+- Date fin  
+- Score courant & final  
+- Mort / victoire  
+- Salle courante  
+- Historique via EF InMemory  
+
+# 🧪 Tests unitaires (V3)
+
+Les tests incluent :
+
+## Tests du modèle & DbContext  
+- Insertion joueur  
+- Accès base InMemory  
+- Relations Donjon → Salles  
+
+## Tests du GameLogicService  
+- Génération donjon + salles  
+- Progression dans toutes les salles  
+- Mort si score négatif  
+- Fin de partie  
+
+## Tests du GameController  
+- Start renvoie 404 si joueur absent  
+- Start renvoie un GameState valide  
+- Choice renvoie BadRequest si choix vide  
+
+Tests utilisent des DB InMemory **fraîches par test**.
+
+# 📊 Couverture de code
+
+Collecte :
+
 ```
-- **Swagger** : [http://localhost:5297/swagger](http://localhost:5297/swagger)
-
-### 🧩 Lancer les tests
-```bash
-dotnet test
-```
-Résultat attendu :  
-```
-Récapitulatif du test : total : 10; échec : 0; réussi : 10; ignoré : 0
-```
-
----
-
-## 🧠 Entités principales
-
-| Entité | Description |
-|--------|--------------|
-| `Joueur` | Représente un joueur lié à un compte Keycloak (Nom, Score, EstActif, KeycloakId) |
-| `Administrateur` | Gère les joueurs (création, désactivation, export) |
-| `Donjon` | Ensemble de salles avec un niveau de difficulté |
-| `Salle` | Élément du donjon : combat, piège, coffre, etc. |
-| `Partie` | Association d’un joueur et d’un donjon ; conserve le score final |
-
----
-
-## 📘 Exemple d’entité
-
-```csharp
-public class Joueur
-{
-    public int Id { get; set; }
-    public string Nom { get; set; } = "";
-    public int Score { get; set; } = 0;
-    public bool EstActif { get; set; } = true;
-    public string KeycloakId { get; set; } = "";
-    public List<Partie>? HistoriqueParties { get; set; }
-}
-```
-
----
-
-## 🧾 Tests unitaires
-
-### Exemple 1 – Test modèle
-```csharp
-[Fact]
-public void Joueur_DefaultScore_IsZero()
-{
-    var joueur = new Joueur();
-    Assert.Equal(0, joueur.Score);
-}
-```
-
-### Exemple 2 – Test DbContext
-```csharp
-[Fact]
-public void CanAddJoueurToDatabase()
-{
-    var options = new DbContextOptionsBuilder<GameDbContext>()
-        .UseInMemoryDatabase("TestDb")
-        .Options;
-
-    using var context = new GameDbContext(options);
-    context.Joueurs.Add(new Joueur { Nom = "Tarek" });
-    context.SaveChanges();
-
-    var joueur = context.Joueurs.FirstOrDefault(j => j.Nom == "Tarek");
-    Assert.NotNull(joueur);
-}
+dotnet test --collect:"XPlat Code Coverage"
 ```
 
----
+Générer un rapport HTML :
 
-## ✅ État de la version
+```
+reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coveragereport -reporttypes:Html
+```
 
-| Élément | Statut |
-|----------|--------|
-| Modèles (SharedModels) | ✅ |
-| Base de données EFCore | ✅ |
-| API CRUD + Swagger | ✅ |
-| Tests unitaires | ✅ |
-| Documentation | ✅ |
+# 🚀 Lancer le projet
 
----
+## Backend API
+```
+dotnet run --project GameServices
+```
 
-## 🚀 Prochaine étape : Version 3
+Swagger :  
+http://localhost:5297/swagger
 
-**Déroulement d’une partie et logique métier**  
-- Génération aléatoire des donjons (suite de salles)  
-- Choix interactifs du joueur (combattre, fuir, fouiller)  
-- Calcul du score et sauvegarde de la partie  
-- Tests de logique de jeu  
+## Frontend Blazor  
+http://localhost:5000/
+
+Page de jeu :  
+http://localhost:5000/play?from=guest
+
+# 📦 Conclusion
+
+La Version 3 est **complètement réalisée** :
+
+✔ Donjon aléatoire  
+✔ Choix interactifs  
+✔ Score dynamique  
+✔ Sauvegarde partie  
+✔ API opérationnelle  
+✔ Blazor UI dynamique  
+✔ Tests enrichis  
+✔ Couverture respectée  
+
+Prêt pour la **V4 : Historique, classement, admin** 🎉

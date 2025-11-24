@@ -1,0 +1,103 @@
+@page "/game/{PartieId:int}"
+@using BlazorGame.Client.Models
+@inject HttpClient Http
+
+<h3>Partie @PartieId</h3>
+
+@if (state is null)
+{
+    <p>Chargement de la partie...</p>
+}
+else
+{
+    <p><strong>Score courant :</strong> @state.ScoreCourant</p>
+    <p><strong>État :</strong> @state.EtatPartie</p>
+
+    @if (state.SalleCourante is not null && !state.EstTerminee)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>Salle actuelle</h5>
+                <p>@state.SalleCourante.Description</p>
+
+                <p><strong>Difficulté :</strong> @state.SalleCourante.Difficulte</p>
+                <p><strong>Gain potentiel :</strong> @state.SalleCourante.PointsGagnes</p>
+                <p><strong>Perte potentielle :</strong> @state.SalleCourante.PointsPerdus</p>
+            </div>
+        </div>
+
+        <h5>Vos choix :</h5>
+
+        <button class="btn btn-danger me-2"
+                @onclick='() => EnvoyerChoix("Combattre")'>
+            Combattre
+        </button>
+
+        <button class="btn btn-secondary me-2"
+                @onclick='() => EnvoyerChoix("Fuir")'>
+            Fuir
+        </button>
+
+        <button class="btn btn-warning"
+                @onclick='() => EnvoyerChoix("Fouiller")'>
+            Fouiller
+        </button>
+    }
+    else
+    {
+        <p><strong>La partie est terminée.</strong></p>
+        <p><strong>Score final :</strong> @state.ScoreFinal</p>
+    }
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <p>@message</p>
+    }
+}
+
+@code {
+    [Parameter] public int PartieId { get; set; }
+
+    private GameState? state;
+    private string? message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ChargerState();
+    }
+
+    private async Task ChargerState()
+    {
+        try
+        {
+            state = await Http.GetFromJsonAsync<GameState>($"api/game/{PartieId}");
+        }
+        catch (Exception ex)
+        {
+            message = $"Erreur de chargement : {ex.Message}";
+        }
+    }
+
+    private async Task EnvoyerChoix(string choix)
+    {
+        if (state is null) return;
+
+        var request = new ChoiceRequest { Choix = choix };
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync($"api/game/{PartieId}/choice", request);
+            if (!response.IsSuccessStatusCode)
+            {
+                message = $"Erreur : {response.StatusCode}";
+                return;
+            }
+
+            state = await response.Content.ReadFromJsonAsync<GameState>();
+        }
+        catch (Exception ex)
+        {
+            message = $"Erreur lors de l'envoi du choix : {ex.Message}";
+        }
+    }
+}

@@ -8,6 +8,6 @@ public class Joueur
     public bool EstActif { get; set; } = true;
     public string KeycloakId { get; set; } = "";
 
-    // Historique des parties jouées
+    // Historique des parties
     public List<Partie>? HistoriqueParties { get; set; }
 }
