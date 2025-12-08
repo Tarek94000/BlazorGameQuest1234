@@ -1,43 +1,139 @@
+@*
+Composant Play.razor - page "/play"
+Brève description :
+- Interface de jeu qui démarre une partie via l'API et envoie les choix du joueur.
+
+Champs principaux :
+- state : état courant de la partie (null pendant le chargement).
+- message : message d'information ou d'erreur affiché à l'utilisateur.
+- joueurId : identifiant du joueur (actuellement fixé à 1).
+
+Cycle de vie :
+- OnInitializedAsync() : lance DemarrerNouvellePartie() au chargement du composant.
+
+Méthodes :
+- DemarrerNouvellePartie() :
+  -> POST vers "api/game/start?joueurId={joueurId}", lit le GameState ou définit message en cas d'erreur/exception.
+- EnvoyerChoix(string choix) :
+  -> POST vers "api/game/{state.PartieId}/choice" avec le choix, met à jour state ou message en cas d'erreur/exception.
+
+Affichage :
+- Montre la salle courante, la difficulté, gains/pertes potentiels, score et état de la partie.
+- Affiche les boutons d'action (Combattre, Fuir, Fouiller) tant que la partie n'est pas terminée.
+- Affiche le score final et un message lorsque la partie est terminée.
+*@
 @page "/play"
-@using BlazorGame.Client.Components
-@inject NavigationManager Nav
+@using BlazorGame.Client.Models
+@inject HttpClient Http
 
-<div class="game-canvas">
-  <BackButton Target="@BackTarget" CssClass="btn-corner" />
+<h2>Nouvelle aventure</h2>
+<p>(V3) Progression d'une partie réelle via l'API.</p>
 
-  <h1>Nouvelle aventure</h1>
-  <p class="lead">(V1) Ici s’affichera la progression. Pour l’instant, on montre UNE salle statique :</p>
+@if (state is null)
+{
+    <p>Chargement de la partie...</p>
+}
+else
+{
+    <div class="card" style="max-width: 400px;">
+        <div class="card-body">
+            <h4>Salle @state.IndexSalleCourante</h4>
 
-  <div class="room-wrap">
-    <RoomView />
-  </div>
-</div>
+            @if (state.SalleCourante is not null)
+            {
+                <p>@state.SalleCourante.Description</p>
+                <p><strong>Difficulté :</strong> @state.SalleCourante.Difficulte</p>
+                <p><strong>Gain potentiel :</strong> @state.SalleCourante.PointsGagnes</p>
+                <p><strong>Perte potentielle :</strong> @state.SalleCourante.PointsPerdus</p>
+            }
+
+            <p><strong>Score :</strong> @state.ScoreCourant</p>
+            <p><strong>État :</strong> @state.EtatPartie</p>
+
+            @if (!state.EstTerminee && state.SalleCourante is not null)
+            {
+                <div class="mt-3">
+                    <button class="btn btn-danger me-2"
+                            @onclick='() => EnvoyerChoix("Combattre")'>
+                        Combattre
+                    </button>
+
+                    <button class="btn btn-secondary me-2"
+                            @onclick='() => EnvoyerChoix("Fuir")'>
+                        Fuir
+                    </button>
+
+                    <button class="btn btn-warning"
+                            @onclick='() => EnvoyerChoix("Fouiller")'>
+                        Fouiller
+                    </button>
+                </div>
+            }
+            else
+            {
+                <p class="mt-3"><strong>La partie est terminée.</strong></p>
+                <p><strong>Score final :</strong> @state.ScoreFinal</p>
+            }
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p class="mt-3">@message</p>
+}
 
 @code {
-  private string BackTarget = "/"; // défaut : retour au menu principal
+    private GameState? state;
+    private string? message;
 
-  protected override void OnInitialized()
-  {
-    // Ex: /play?from=guest  -> retour vers /guest
-    var uri = new Uri(Nav.Uri);
-    var query = uri.Query; // "?from=guest"
+    // pour l'instant, on force joueurId = 1 (on pourra lier ça à notre perso invité)
+    private int joueurId = 1;
 
-    if (!string.IsNullOrEmpty(query))
+    protected override async Task OnInitializedAsync()
     {
-      var parts = query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries);
-      foreach (var p in parts)
-      {
-        var kv = p.Split('=', 2);
-        if (kv.Length >= 1 && string.Equals(kv[0], "from", StringComparison.OrdinalIgnoreCase))
-        {
-          var value = kv.Length == 2 ? Uri.UnescapeDataString(kv[1]) : string.Empty;
-          if (string.Equals(value, "guest", StringComparison.OrdinalIgnoreCase))
-          {
-            BackTarget = "/guest";
-          }
-          break;
-        }
-      }
+        await DemarrerNouvellePartie();
     }
-  }
+
+    private async Task DemarrerNouvellePartie()
+    {
+        try
+        {
+            var response = await Http.PostAsync($"api/game/start?joueurId={joueurId}", null);
+            if (!response.IsSuccessStatusCode)
+            {
+                message = $"Erreur au démarrage : {response.StatusCode}";
+                return;
+            }
+
+            state = await response.Content.ReadFromJsonAsync<GameState>();
+        }
+        catch (Exception ex)
+        {
+            message = $"Exception au démarrage : {ex.Message}";
+        }
+    }
+
+    private async Task EnvoyerChoix(string choix)
+    {
+        if (state is null) return;
+
+        var request = new ChoiceRequest { Choix = choix };
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync($"api/game/{state.PartieId}/choice", request);
+            if (!response.IsSuccessStatusCode)
+            {
+                message = $"Erreur : {response.StatusCode}";
+                return;
+            }
+
+            state = await response.Content.ReadFromJsonAsync<GameState>();
+        }
+        catch (Exception ex)
+        {
+            message = $"Erreur lors de l'envoi du choix : {ex.Message}";
+        }
+    }
 }
