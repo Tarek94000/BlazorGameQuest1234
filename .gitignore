@@ -1,60 +1,103 @@
-## Visual Studio / .NET build folders
-bin/
-obj/
-[Bb]uild/
-[Bb]uilds/
-[Ll]ogs/
-[Tt]est[Rr]esult*/
+# =====================================
+# .NET / C# / BlazorGameQuest gitignore
+# =====================================
 
-## User-specific files
-*.suo
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Rr]elease/
+[Dd]ebug/
+out/
+
+# User-specific files
 *.user
 *.userosscache
-*.sln.docstates
+*.suo
+*.rsuser
+*.vsp
+*.vspscc
+*.vssscc
+*.dbmdl
 
-## NuGet packages
-*.nupkg
-*.snupkg
-packages/
-*.nuget.props
-*.nuget.targets
-
-## Visual Studio cache/options directory
+# Visual Studio files
 .vs/
 .vscode/
 
-## Build results
-*.dll
-*.exe
-*.appx
-*.appxbundle
-*.cache
-*.pdb
-*.mdb
+# ASP.NET
+*.vspscc
+*.vssscc
 
-## ASP.NET / Blazor specific
-wwwroot/_framework/
-wwwroot/css/bootstrap*.css.map
-wwwroot/js/bootstrap*.js.map
+# Test results
+TestResult*/
+*.trx
+*.coverage
+*.TestResults.xml
 
-## Publish output
-*.publishsettings
-publish/
-out/
+# Entity Framework Migrations cache
+Migrations/
 
-## Config files generated at runtime
-appsettings.Development.json
-appsettings.Production.json
-
-## Other
-Thumbs.db
-Desktop.ini
-*.log
-*.dbmdl
-*.bak
+# Temporary files
 *.tmp
+*.temp
+*.bak
+*.log
+*.tlog
+*.cache
+*.swp
 
-# Rider / JetBrains
+# Build artifacts
+artifacts/
+publish/
+bin/
+obj/
+logs/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+*.nuspec
+project.lock.json
+project.fragment.lock.json
+
+# JetBrains Rider
 .idea/
 *.sln.iml
 
+# Docker
+**/Dockerfile
+**/docker-compose*.yml
+**/docker-compose*.yaml
+
+# Secrets / config local
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+
+# Coverage tools
+coverage/
+*.coverage
+*.coveragexml
+*.opencover.xml
+
+# Node / Blazor (frontend)
+node_modules/
+wwwroot/dist/
+wwwroot/.cache/
+wwwroot/css/
+wwwroot/js/
+npm-debug.log
+yarn-error.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Others
+*.bak
+*.orig
+*.rej
+*.swp

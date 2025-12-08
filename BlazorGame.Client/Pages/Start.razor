@@ -1,0 +1,33 @@
+@page "/"
+@inject NavigationManager Nav
+
+<PageTitle>Bienvenue</PageTitle>
+
+<div class="start-canvas">
+  <h1 class="title">Bienvenue dans <span>BlazorQuest</span></h1>
+  <p class="subtitle">Choisissez une option pour commencer</p>
+
+  <div class="grid3">
+    <button class="bigcard disabled" disabled title="Disponible en V2">
+      <div class="emoji">🔐</div>
+      <div class="label">Se connecter</div>
+      <div class="hint">(V2 – Keycloak)</div>
+    </button>
+
+    <button class="bigcard disabled" disabled title="Disponible en V2">
+      <div class="emoji">📝</div>
+      <div class="label">S’inscrire</div>
+      <div class="hint">Créer un compte</div>
+    </button>
+
+    <button class="bigcard primary" @onclick="StartAsGuest">
+      <div class="emoji">🎮</div>
+      <div class="label">Continuer en tant qu’invité</div>
+      <div class="hint">Jouer sans enregistrer</div>
+    </button>
+  </div>
+</div>
+
+@code {
+  void StartAsGuest() => Nav.NavigateTo("/guest");
+}

@@ -1,0 +1,50 @@
+@page "/nouvelle-aventure"
+@using BlazorGame.Client.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Nouvelle aventure</h3>
+
+<div class="mb-3">
+    <label>Id du joueur :</label>
+    <input type="number" @bind="joueurId" class="form-control" />
+</div>
+
+<button class="btn btn-primary" @onclick="DemarrerAventure">Démarrer</button>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+@code {
+    private int joueurId = 1; // par défaut
+    private string? message;
+
+    private async Task DemarrerAventure()
+    {
+        try
+        {
+            var response = await Http.PostAsync($"api/game/start?joueurId={joueurId}", null);
+            if (!response.IsSuccessStatusCode)
+            {
+                message = $"Erreur : {response.StatusCode}";
+                return;
+            }
+
+            var state = await response.Content.ReadFromJsonAsync<GameState>();
+            if (state is null)
+            {
+                message = "Réponse invalide du serveur.";
+                return;
+            }
+
+            // Rediriger vers la page de jeu avec l'id de la partie
+            Navigation.NavigateTo($"/game/{state.PartieId}");
+        }
+        catch (Exception ex)
+        {
+            message = $"Exception : {ex.Message}";
+        }
+    }
+}

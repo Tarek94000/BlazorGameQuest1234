@@ -1,126 +1,170 @@
-# 🕹️ BlazorGameQuest
 
-**Projet en continu – Développement Agile (.NET & C# / Efrei 2025-2026)**  
-Cours : *Environnement .NET et C# (ALTN71)*  
-Enseignant : **Thierry TAGNE**
+# 📘 BlazorGameQuest – Version 3  
+**Binôme : EL MISSIRY Tarek & KHAN Ibrahim**
 
----
+## 🎯 Objectif de la Version 3  
+La V3 porte sur **le déroulement complet d’une partie** avec :
 
-## 🎯 Objectif du projet
+- Génération aléatoire d’un/plusieurs donjons  
+- Interface de jeu interactive via Blazor  
+- Choix dans les salles  
+- Calcul dynamique du score  
+- Sauvegarde de la partie  
+- Tests unitaires enrichis  
+- Mesure de la couverture de code  
 
-Développer un **jeu d’aventure Blazor** où les joueurs explorent des donjons aléatoires, affrontent des ennemis, et gagnent des points selon leurs choix.  
-Le projet repose sur une architecture **.NET multi-projets** (Client, API, Modèles partagés, Tests unitaires) et sera développé en plusieurs rendus successifs (V1 → V5).
+Cette version combine le **backend (API .NET)** et le **frontend (Blazor WebAssembly)**.
 
----
-
-## 🧱 Architecture du projet
+# 🏗️ Architecture du projet
 
 ```
 BlazorGameQuest1234/
-├── BlazorGame.Client/          # Frontend Blazor WebAssembly (interface du jeu)
-│   ├── Pages/                  # Pages principales : Home, Play, Scores, Admin
-│   ├── Components/             # Composant de salle de jeu (RoomView)
-│   └── Layout/                 # Layout et navigation
 │
-├── AuthenticationServices/     # Backend Web API (.NET 9)
+├── BlazorGame.Client/            → Frontend Blazor WebAssembly
+│   ├── Pages/
+│   │   ├── Play.razor            → Page de jeu interactive (V3)
+│   ├── Models/
+│   │   ├── GameState.cs
+│   │   ├── SalleDto.cs
+│   │   ├── ChoiceRequest.cs
+│   └── Program.cs                → HttpClient configuré pour API
+│
+├── GameServices/                 → Backend API logique du jeu
 │   ├── Controllers/
-│   │   ├── PingController.cs   # Endpoint de test
-│   │   └── JoueurController.cs # Endpoint listant des joueurs
-│   └── Program.cs              # Configuration API + Swagger
+│   │   ├── GameController.cs     → API jeu (start, state, choice)
+│   ├── Services/
+│   │   └── GameLogicService.cs   → Logique métier V3
+│   ├── Data/
+│   │   └── GameDbContext.cs      → Base EF InMemory
+│   └── Program.cs                → Swagger, CORS, seed invité
 │
-├── SharedModels/               # Bibliothèque de classes partagées
-│   ├── Joueur.cs               # Modèle Joueur (Nom, Score)
-│   └── RoomType.cs             # Types de salles (Enemy, Trap, Chest…)
+├── SharedModels/                 → Modèles partagés (entités)
+│   ├── Joueur.cs
+│   ├── Donjon.cs
+│   ├── Salle.cs
+│   ├── Partie.cs
+│   ├── RoomType.cs
 │
-├── BlazorGame.Tests/           # Tests unitaires (xUnit)
-│   └── JoueurTests.cs
-│
-└── Readme.md                   # Documentation du projet
+└── Tests/                        → Tests unitaires (xUnit)
+    ├── GameLogicTests.cs
+    ├── DbContextTests.cs
+    ├── JoueurTests.cs
 ```
 
----
+# 🧠 Fonctionnalités implémentées en V3
 
-## 🧪 Fonctionnalités de la Version 1 (V1)
+## Génération aléatoire du donjon  
+Dans `GameLogicService` :
 
-- ✅ Création complète de la **solution .NET** (4 projets)
-- ✅ Mise en place du **frontend Blazor WebAssembly**
-- ✅ **Routing**, **layout**, et pages principales (`Home`, `Play`, `Scores`, `Admin`)
-- ✅ Composant Blazor statique (`RoomView.razor`)
-- ✅ Création du **backend Web API** :
-  - `PingController` (test de disponibilité)
-  - `JoueurController` (liste de joueurs simulée)
-  - **Swagger** activé pour la documentation
-- ✅ Projet **SharedModels** (modèles partagés entre client et API)
-- ✅ Projet **de tests unitaires** (`xUnit`)
-- ✅ Configuration **port 5000** pour le client, **5050** pour l’API
-- ✅ Documentation initiale (README)
+- Entre **1 et 5 salles aléatoires**
+- Description dynamique selon le type (`Enemy`, `Chest`, `Trap`, etc.)
+- Points gagnés/perdus aléatoires  
+- Difficulté aléatoire
 
----
+## Interface de jeu interactive  
+Dans `Play.razor` :
 
-## ▶️ Lancement du projet
+- Affichage de la salle courante  
+- Score courant  
+- Choix interactifs :  
+  - **Combattre**  
+  - **Fuir**  
+  - **Fouiller**  
+- Mise à jour de l’état via API  
+- Affichage fin de partie + score final  
 
-### 1️⃣ Lancer l’API
-```bash
-dotnet run --project .\AuthenticationServices\ --urls "http://localhost:5050"
+L’UI utilise :  
+`POST /api/game/start?joueurId=1`  
+`GET /api/game/{partieId}`  
+`POST /api/game/{partieId}/choice`  
+
+## Calcul du score  
+Dans `GameLogicService.AppliquerChoixAsync` :
+
+- Combattre → gros gain/perte avec probabilité  
+- Fuir → petit gain  
+- Fouiller → trésor/piège  
+- Score négatif = mort immédiate  
+- Index de salle incrémenté  
+- Fin de donjon = partie terminée  
+
+## Sauvegarde de la partie  
+Chaque action appelle :
+
+`await _context.SaveChangesAsync();`
+
+Données conservées :
+
+- Date début  
+- Date fin  
+- Score courant & final  
+- Mort / victoire  
+- Salle courante  
+- Historique via EF InMemory  
+
+# 🧪 Tests unitaires (V3)
+
+Les tests incluent :
+
+## Tests du modèle & DbContext  
+- Insertion joueur  
+- Accès base InMemory  
+- Relations Donjon → Salles  
+
+## Tests du GameLogicService  
+- Génération donjon + salles  
+- Progression dans toutes les salles  
+- Mort si score négatif  
+- Fin de partie  
+
+## Tests du GameController  
+- Start renvoie 404 si joueur absent  
+- Start renvoie un GameState valide  
+- Choice renvoie BadRequest si choix vide  
+
+Tests utilisent des DB InMemory **fraîches par test**.
+
+# 📊 Couverture de code
+
+Collecte :
+
 ```
-- Test API : [http://localhost:5050/ping](http://localhost:5050/ping)
-- Liste des joueurs : [http://localhost:5050/joueur](http://localhost:5050/joueur)
-- Swagger : [http://localhost:5050/swagger](http://localhost:5050/swagger)
-
-### 2️⃣ Lancer le client Blazor
-```bash
-dotnet run --project .\BlazorGame.Client\
+dotnet test --collect:"XPlat Code Coverage"
 ```
-- Accès au site : [http://localhost:5000](http://localhost:5000)
 
-> 💡 L’API doit rester en marche pendant que le client tourne.
+Générer un rapport HTML :
 
----
+```
+reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coveragereport -reporttypes:Html
+```
 
-## ⚙️ Technologies utilisées
+# 🚀 Lancer le projet
 
-- **.NET 9 / C# 12**
-- **Blazor WebAssembly**
-- **ASP.NET Core Web API**
-- **Entity Framework Core (InMemory à venir)**
-- **Swagger / OpenAPI**
-- **xUnit** (tests unitaires)
-- **Git / GitLab** (branche `main` → `prod`)
+## Backend API
+```
+dotnet run --project GameServices
+```
 
----
+Swagger :  
+http://localhost:5297/swagger
 
-## 👥 Équipe
+## Frontend Blazor  
+http://localhost:5000/
 
-| Nom | Rôle |
-|------|------|
-| Tarek | Développeur C# |
-| Ibrahim | Développeur C# |
+Page de jeu :  
+http://localhost:5000/play?from=guest
 
----
+# 📦 Conclusion
 
-## 🧾 Version actuelle
+La Version 3 est **complètement réalisée** :
 
-> **Version 1 – Structure du projet + tests initiaux + premières pages Blazor**  
->  
-> ✅ Architecture fonctionnelle  
-> ✅ Communication API–Client prête pour V2  
-> ⏳ Prochaine étape : EFCore, Keycloak et API Gateway (V2-V3)
+✔ Donjon aléatoire  
+✔ Choix interactifs  
+✔ Score dynamique  
+✔ Sauvegarde partie  
+✔ API opérationnelle  
+✔ Blazor UI dynamique  
+✔ Tests enrichis  
+✔ Couverture respectée  
 
----
-
-## 📅 Plan des prochaines versions
-
-| Version | Objectif principal | Date prévue |
-|----------|--------------------|--------------|
-| V1 | Structure, tests, Blazor base | ✅ 13/10/2025 |
-| V2 | EFCore + stockage InMemory | 06/11/2025 |
-| V3 | Auth Keycloak (OAuth2) | 10/11/2025 |
-| V4 | Gateway + rôles + Docker | 17/11/2025 |
-| V5 | Finalisation & déploiement | 27/11/2025 |
-
----
-
-## 🧩 Auteur
-
-> Projet réalisé dans le cadre du cours **Environnement .NET et C# (ALTN71)** – Efrei Paris  
-> Année universitaire **2025–2026**  
+Prêt pour la **V4 : Historique, classement, admin** 🎉

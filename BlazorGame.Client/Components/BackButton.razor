@@ -1,0 +1,8 @@
+<button class="back @CssClass" @onclick="GoBack">RETOUR</button>
+
+@code {
+  [Parameter] public string Target { get; set; } = "/";
+  [Parameter] public string? CssClass { get; set; }
+  [Inject] NavigationManager Nav { get; set; } = default!;
+  void GoBack() => Nav.NavigateTo(Target);
+}
