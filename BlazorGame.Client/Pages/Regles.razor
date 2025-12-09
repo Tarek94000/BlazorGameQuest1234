@@ -1,0 +1,60 @@
+@page "/regles"
+
+<PageTitle>Règles du Jeu</PageTitle>
+
+<div class="rules-container">
+    <h1>Règles du Jeu</h1>
+
+    <div class="card rule-card">
+        <div class="card-body">
+            <h3>📜 Objectif</h3>
+            <p>Survivre à travers une série de salles dangereuses et accumuler le meilleur score possible.</p>
+        </div>
+    </div>
+
+    <div class="card rule-card">
+        <div class="card-body">
+            <h3>⚔️ Déroulement (V1)</h3>
+            <ul>
+                <li>Une aventure se compose de <strong>5 salles maximum</strong>.</li>
+                <li>Dans chaque salle, vous devez faire un choix :
+                    <ul>
+                        <li><strong>Combattre</strong> : Affrontez le danger pour gagner des points.</li>
+                        <li><strong>Fouiller</strong> : Cherchez des trésors (ou des pièges !).</li>
+                        <li><strong>Fuir</strong> : Évitez le risque, mais ne gagnez rien.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card rule-card">
+        <div class="card-body">
+            <h3>ℹ️ Notes de version</h3>
+            <ul>
+                <li>Les effets de score avancés seront ajoutés dans la version V2.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="/play" class="btn btn-primary btn-lg">🎮 Lancer une aventure</a>
+        <a href="/" class="btn btn-secondary btn-lg ms-2">🏠 Retour à l'accueil</a>
+    </div>
+</div>
+
+<style>
+    .rules-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .rule-card {
+        margin-bottom: 1.5rem;
+        background-color: rgba(255, 255, 255, 0.05); /* Semi-transparent background for dark mode usually */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .rule-card h3 {
+        color: #ffc107; /* Gold color for headers */
+    }
+</style>
