@@ -1,0 +1,198 @@
+﻿@page "/admin"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "admin")]
+@using BlazorGame.Client.Models
+@inject HttpClient Http
+
+<AuthorizeView Roles="admin">
+    <NavLink class="nav-link" href="admin">
+        <span class="oi oi-dashboard" aria-hidden="true"></span> Admin
+    </NavLink>
+</AuthorizeView>
+
+
+<h3>Dashboard Administrateur</h3>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+<h4>Joueurs</h4>
+
+@if (joueurs is null)
+{
+    <p>Chargement des joueurs...</p>
+}
+else if (!joueurs.Any())
+{
+    <p>Aucun joueur.</p>
+}
+else
+{
+    <button class="btn btn-sm btn-outline-primary mb-2" @onclick="ExporterJoueurs">
+        Exporter les joueurs (CSV)
+    </button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Score</th>
+                <th>Parties</th>
+                <th>Actif</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var j in joueurs)
+        {
+            <tr>
+                <td>@j.Id</td>
+                <td>@j.Nom</td>
+                <td>@j.Score</td>
+                <td>@j.NombreParties</td>
+                <td>@(j.EstActif ? "Oui" : "Non")</td>
+                <td>
+                    @if (j.EstActif)
+                    {
+                        <button class="btn btn-sm btn-warning"
+                                @onclick="() => ChangerEtatJoueur(j, false)">
+                            Désactiver
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-sm btn-success"
+                                @onclick="() => ChangerEtatJoueur(j, true)">
+                            Activer
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<h4>Parties</h4>
+
+@if (parties is null)
+{
+    <p>Chargement des parties...</p>
+}
+else if (!parties.Any())
+{
+    <p>Aucune partie enregistrée.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Joueur</th>
+                <th>Donjon</th>
+                <th>Score</th>
+                <th>Début</th>
+                <th>Fin</th>
+                <th>État</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var p in parties)
+        {
+            <tr>
+                <td>@p.PartieId</td>
+                <td>@p.JoueurNom (@p.JoueurId)</td>
+                <td>@p.DonjonNom</td>
+                <td>@p.ScoreFinal</td>
+                <td>@p.DateDebut.ToString("g")</td>
+                <td>@(p.DateFin?.ToString("g") ?? "-")</td>
+                <td>@p.EtatPartie</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<AdminJoueur>? joueurs;
+    private List<AdminPartie>? parties;
+    private string? message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ChargerJoueurs();
+        await ChargerParties();
+    }
+
+    private async Task ChargerJoueurs()
+    {
+        try
+        {
+            joueurs = await Http.GetFromJsonAsync<List<AdminJoueur>>("api/admin/joueurs");
+        }
+        catch (Exception ex)
+        {
+            message = $"Erreur chargement joueurs : {ex.Message}";
+        }
+    }
+
+    private async Task ChargerParties()
+    {
+        try
+        {
+            parties = await Http.GetFromJsonAsync<List<AdminPartie>>("api/admin/parties");
+        }
+        catch (Exception ex)
+        {
+            message = $"Erreur chargement parties : {ex.Message}";
+        }
+    }
+
+    private async Task ChangerEtatJoueur(AdminJoueur joueur, bool activer)
+    {
+        try
+        {
+            var url = activer
+                ? $"api/admin/joueurs/{joueur.Id}/activer"
+                : $"api/admin/joueurs/{joueur.Id}/desactiver";
+
+            var response = await Http.PutAsync(url, null);
+            if (response.IsSuccessStatusCode)
+            {
+                joueur.EstActif = activer;
+                message = null;
+            }
+            else
+            {
+                message = $"Erreur changement état joueur : {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Exception changement état joueur : {ex.Message}";
+        }
+    }
+
+    private async Task ExporterJoueurs()
+    {
+        try
+        {
+            var response = await Http.GetAsync("api/admin/export/joueurs");
+            if (!response.IsSuccessStatusCode)
+            {
+                message = $"Erreur export joueurs : {response.StatusCode}";
+                return;
+            }
+
+            // Dans un vrai browser on utiliserait JS interop pour télécharger le fichier.
+            message = "Export effectué (voir l'appel API dans les outils dev).";
+        }
+        catch (Exception ex)
+        {
+            message = $"Erreur export : {ex.Message}";
+        }
+    }
+}

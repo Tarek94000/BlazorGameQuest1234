@@ -1,0 +1,57 @@
+:root{ --gold:#f8d26a; --ink:#1f2937; }
+
+/* Panneau centré, plus large */
+.home-canvas{
+  width:min(900px, 96%);
+  margin-inline:auto;
+  background:#ffffff; color:#111827;
+  border-radius:16px;
+  padding:1.25rem 1.25rem 2rem;
+  box-shadow:0 18px 60px rgba(0,0,0,.18);
+}
+
+/* Carte principale */
+.panel{
+  position:relative;
+  background: linear-gradient(180deg, rgba(241,195,78,.16), rgba(241,195,78,.05));
+  border: 3px solid rgba(241,195,78,.55);
+  border-radius: 16px;
+  padding: 1.25rem 1.25rem 1.5rem;
+  box-shadow: inset 0 0 50px rgba(0,0,0,.08);
+}
+
+.panel-header{ position:relative; }
+.logo{
+  margin:.2rem 0 1rem; line-height:.92; color:var(--gold);
+  text-shadow:0 2px 0 #8c6b12, 0 6px 18px rgba(248,210,106,.35);
+  letter-spacing:1px; font-size:clamp(2.4rem, 6vw, 3.6rem);
+}
+
+/* Mascotte en haut-droite, plus petite */
+.avatar{
+  position:absolute; top:.4rem; right:.4rem;
+  transform: scale(.7); transform-origin: top right;
+  filter: drop-shadow(0 18px 36px rgba(0,0,0,.25));
+}
+
+/* Sélecteur compact */
+.selector{ margin:.5rem 0 1rem; }
+.selector label{ display:block; font-weight:800; color:var(--ink); margin-bottom:.35rem; }
+.selector select{
+  width:100%; padding:.6rem .7rem; border-radius:10px; border:1px solid rgba(0,0,0,.14);
+  background:#fff; font-weight:700; letter-spacing:.2px;
+}
+
+/* Menu */
+.menu-col{ display:flex; flex-direction:column; gap:.8rem; margin-top:.4rem; }
+.item{
+  display:block; text-align:left; cursor:pointer; user-select:none;
+  padding:1rem 1.1rem; border-radius:12px; text-decoration:none;
+  background:#fff; border:2px solid rgba(0,0,0,.14);
+  color:#111; font-weight:800; letter-spacing:.4px; box-shadow: inset 0 -2px 0 rgba(0,0,0,.1);
+}
+.item:hover{ transform: translateY(-1px); }
+.item.primary{
+  background: linear-gradient(180deg, rgba(230,77,61,.9), rgba(230,77,61,.7));
+  border-color: rgba(230,77,61,1); color:white; text-shadow:0 1px 0 rgba(0,0,0,.35);
+}

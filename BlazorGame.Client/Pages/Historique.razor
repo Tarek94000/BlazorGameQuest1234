@@ -1,0 +1,91 @@
+@page "/historique"
+@using BlazorGame.Client.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IHttpClientFactory ClientFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject HttpClient Http
+
+<h3>Mon historique de parties</h3>
+
+@if (parties is null)
+{
+    <p>Chargement...</p>
+}
+else if (!parties.Any())
+{
+    <p>Aucune partie enregistrée pour le moment.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Partie</th>
+                <th>Donjon</th>
+                <th>Score final</th>
+                <th>Début</th>
+                <th>Fin</th>
+                <th>État</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var p in parties)
+        {
+            <tr>
+                <td>@p.PartieId</td>
+                <td>@p.DonjonNom</td>
+                <td>@p.ScoreFinal</td>
+                <td>@p.DateDebut.ToString("g")</td>
+                <td>@(p.DateFin?.ToString("g") ?? "-")</td>
+                <td>@p.EtatPartie</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+@code {
+    private List<HistoriquePartie>? parties;
+    private string? message;
+
+    // Pour l’instant on fixe le joueur à 1
+    private int joueurId = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            HttpClient client;
+            string url;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                 client = ClientFactory.CreateClient("GameApi");
+                 url = "api/joueurs/me/parties";
+            }
+            else
+            {
+                 client = ClientFactory.CreateClient("PublicGameApi");
+                 url = $"api/joueurs/{joueurId}/parties";
+            }
+
+            parties = await client.GetFromJsonAsync<List<HistoriquePartie>>(url);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            // Pas d'historique ou joueur introuvable => on affiche vide
+            parties = new List<HistoriquePartie>();
+        }
+        catch (Exception ex)
+        {
+            message = $"Erreur lors du chargement de l'historique : {ex.Message}";
+        }
+    }
+}

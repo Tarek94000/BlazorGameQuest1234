@@ -1,0 +1,61 @@
+@page "/classement"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using BlazorGame.Client.Models
+@inject HttpClient Http
+
+<h3>Classement général</h3>
+
+@if (entries is null)
+{
+    <p>Chargement du classement...</p>
+}
+else if (!entries.Any())
+{
+    <p>Aucun joueur n'a encore de score.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Rang</th>
+                <th>Joueur</th>
+                <th>Meilleur score</th>
+                <th>Nombre de parties</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var entry in entries.Select((e, index) => new { e, index }))
+        {
+            <tr>
+                <td>@(entry.index + 1)</td>
+                <td>@entry.e.Nom</td>
+                <td>@entry.e.MeilleurScore</td>
+                <td>@entry.e.NombreParties</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+@code {
+    private List<ClassementEntry>? entries;
+    private string? message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            entries = await Http.GetFromJsonAsync<List<ClassementEntry>>("api/classement");
+        }
+        catch (Exception ex)
+        {
+            message = $"Erreur lors du chargement du classement : {ex.Message}";
+        }
+    }
+}

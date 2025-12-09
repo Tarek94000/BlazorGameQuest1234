@@ -1,0 +1,99 @@
+/* Dark Dungeon Layout */
+
+.page {
+  background: transparent;
+  /* Let body bg show through */
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+}
+
+/* Sidebar */
+.sidebar {
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+  border-right: 2px solid #333;
+  padding: 1.5rem 1rem;
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.brand {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  color: var(--accent-gold);
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 10px rgba(197, 160, 89, 0.4);
+  border-bottom: 1px solid #333;
+  padding-bottom: 1rem;
+}
+
+/* Main Content Area */
+.main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.top-row {
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(5px);
+  border-bottom: 1px solid #333;
+  min-height: 3.5rem;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  z-index: 90;
+}
+
+.content {
+  padding: 2rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Container limits width but shouldn't have background now */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  /* Removed white background and shadow so inner pages define their own canvas */
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 860px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 2px solid #333;
+  }
+
+  .main {
+    height: auto;
+    overflow: visible;
+  }
+
+  .content {
+    padding: 1rem;
+    overflow-y: visible;
+  }
+
+  .top-row {
+    position: sticky;
+    top: 0;
+  }
+}

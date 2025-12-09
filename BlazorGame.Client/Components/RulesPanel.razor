@@ -1,0 +1,63 @@
+@if (IsOpen)
+{
+  <div class="backdrop" @onclick="Close">
+    <div class="panel" @onclick:stopPropagation="true">
+      <div class="panel-header">
+        <h3>📜 Règles</h3>
+        <button class="close" @onclick="Close" aria-label="Fermer">✖</button>
+      </div>
+
+      <div class="panel-body">
+        <h4>🎯 Objectif</h4>
+        <p>Explorer un donjon généré aléatoirement, survivre et obtenir le meilleur score.</p>
+
+        <h4>🎲 Génération du Donjon</h4>
+        <ul>
+          <li>Chaque partie génère un donjon aléatoire.</li>
+          <li>Contient entre <b>1 et 5 salles</b>.</li>
+          <li>Chaque salle possède : un type, une description, une difficulté, des points gagnés/perdus.</li>
+        </ul>
+
+        <h4>🧱 Types de Salles</h4>
+        <ul>
+          <li><b>Ennemi</b> : combat risqué mais potentiellement très rentable.</li>
+          <li><b>Coffre</b> : trésor ou piège.</li>
+          <li><b>Piège</b> : danger direct.</li>
+          <li><b>Énigme</b> : issue incertaine.</li>
+          <li><b>Vide</b> : apparemment sans danger.</li>
+        </ul>
+
+        <h4>🎮 Actions</h4>
+        <ul>
+          <li><b>Combattre</b> : gros gain ou grosse perte selon réussite.</li>
+          <li><b>Fuir</b> : sûr mais peu de points.</li>
+          <li><b>Fouiller</b> : chance de trésor ou de piège.</li>
+        </ul>
+
+        <h4>📈 Score</h4>
+        <ul>
+          <li>Chaque action modifie le <b>score courant</b>.</li>
+          <li>Score ≤ 0 : <b>mort immédiate</b>.</li>
+          <li>Fin de partie = score final enregistré.</li>
+        </ul>
+
+        <h4>🏁 Fin de Partie</h4>
+        <ul>
+          <li>Vous avez traversé toutes les salles du donjon.</li>
+          <li>Ou vous êtes mort.</li>
+        </ul>
+
+      </div>
+
+      <div class="panel-footer">
+        <button class="ok" @onclick="Close">OK</button>
+      </div>
+    </div>
+  </div>
+}
+
+@code {
+  [Parameter] public bool IsOpen { get; set; }
+  [Parameter] public EventCallback OnClose { get; set; }
+  void Close() => OnClose.InvokeAsync();
+}

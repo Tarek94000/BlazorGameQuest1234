@@ -1,0 +1,250 @@
+@*
+Composant Play.razor - page "/play"
+Brève description :
+- Interface de jeu qui démarre une partie via l'API et envoie les choix du joueur.
+
+Champs principaux :
+- state : état courant de la partie (null pendant le chargement).
+- message : message d'information ou d'erreur affiché à l'utilisateur.
+- joueurId : identifiant du joueur (actuellement fixé à 1).
+
+Cycle de vie :
+- OnInitializedAsync() : lance DemarrerNouvellePartie() au chargement du composant.
+
+Méthodes :
+- DemarrerNouvellePartie() :
+  -> POST vers "api/game/start?joueurId={joueurId}", lit le GameState ou définit message en cas d'erreur/exception.
+- EnvoyerChoix(string choix) :
+  -> POST vers "api/game/{state.PartieId}/choice" avec le choix, met à jour state ou message en cas d'erreur/exception.
+
+Affichage :
+- Montre la salle courante, la difficulté, gains/pertes potentiels, score et état de la partie.
+- Affiche les boutons d'action (Combattre, Fuir, Fouiller) tant que la partie n'est pas terminée.
+- Affiche le score final et un message lorsque la partie est terminée.
+*@
+@page "/play"
+@using BlazorGame.Client.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IHttpClientFactory ClientFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject HttpClient Http
+
+<h2>Nouvelle aventure</h2>
+
+
+@if (state is null)
+{
+    <div class="loading-screen">
+        <div class="loading-progress">
+             <svg width="100%" height="100%" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40"></circle>
+                <circle cx="50" cy="50" r="40"></circle>
+            </svg>
+        </div>
+        <p class="loading-text">Summoning Dungeon...</p>
+    </div>
+}
+else
+{
+    <div class="dungeon-interface">
+        <div class="dungeon-header">
+            <h2 class="room-title">Salle @state.IndexSalleCourante</h2>
+            <div class="score-badge">
+                <span class="label">Score</span>
+                <span class="value">@state.ScoreCourant</span>
+            </div>
+        </div>
+
+        <div class="dungeon-scene @GetRoomClass((RoomType?)state.SalleCourante?.Type)">
+            @if (state.SalleCourante is not null)
+            {
+                <div class="scene-visual">
+                    <span class="scene-emoji">@GetRoomEmoji((RoomType)state.SalleCourante.Type)</span>
+                </div>
+
+                <div class="scene-description">
+                    <p>@state.SalleCourante.Description</p>
+                </div>
+                
+                <div class="scene-stats">
+                    <div class="stat-item danger">
+                        <i class="icon-skull"></i>
+                        <span>☠️ Difficulté: @state.SalleCourante.Difficulte</span>
+                    </div>
+                     <div class="stat-item gain">
+                        <span>💰 Potentiel: +@state.SalleCourante.PointsGagnes</span>
+                    </div>
+                     <div class="stat-item loss">
+                        <span>🩸 Risque: -@state.SalleCourante.PointsPerdus</span>
+                    </div>
+                </div>
+            }
+
+            @if (state.EstTerminee)
+            {
+                <div class="game-over">
+                    <h3>L'aventure est terminée.</h3>
+                    <div class="final-score">Score Final: @state.ScoreFinal</div>
+                    <p class="status">@state.EtatPartie</p>
+                </div>
+            }
+        </div>
+
+        <div class="dungeon-actions">
+             @if (!state.EstTerminee && state.SalleCourante is not null)
+            {
+                <button class="action-btn combat" @onclick='() => EnvoyerChoix("Combattre")'>
+                    <div class="icon">⚔️</div>
+                    <span>Combattre</span>
+                </button>
+                <button class="action-btn flee" @onclick='() => EnvoyerChoix("Fuir")'>
+                    <div class="icon">🦶</div>
+                    <span>Fuir</span>
+                </button>
+                <button class="action-btn search" @onclick='() => EnvoyerChoix("Fouiller")'>
+                    <div class="icon">🔍</div>
+                    <span>Fouiller</span>
+                </button>
+            }
+            else
+            {
+                 <button class="action-btn restart" @onclick="DemarrerNouvellePartie">
+                    <div class="icon">🔄</div>
+                    <span>Recommencer</span>
+                </button>
+            }
+        </div>
+        
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="system-message">
+                @message
+            </div>
+        }
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(message))
+{
+    @if(state is null) { <p class="mt-3">@message</p> } 
+}
+
+@using SharedModels
+
+@code {
+    private GameState? state;
+    private string? message;
+    private int joueurId = 1;
+
+    // Client HTTP qui sera choisi dynamiquement
+    private HttpClient _client = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try 
+        {
+            // Récupère l'état d'authentification de l'utilisateur actuel
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                // Utilisateur connecté : on utilise le client "GameApi" qui inclut automatiquement
+                // le jeton (Token) JWT dans les en-têtes grâce à la configuration du HttpClient dans Program.cs.
+                _client = ClientFactory.CreateClient("GameApi");
+            }
+            else
+            {
+                // Utilisateur non connecté (Invité) : on utilise un client public sans jeton d'authentification.
+                _client = ClientFactory.CreateClient("PublicGameApi");
+            }
+
+            // Une fois le bon client HTTP configuré, on lance la partie.
+            await DemarrerNouvellePartie();
+        }
+        catch (Exception ex)
+        {
+             message = $"Erreur d'initialisation : {ex.Message}";
+        }
+    }
+
+    /// <summary>
+    /// Initialise une nouvelle partie en appelant l'API Backend.
+    /// </summary>
+    private async Task DemarrerNouvellePartie()
+    {
+        try
+        {
+            // Appel POST vers le endpoint de démarrage. 
+            // Si l'utilisateur est connecté, le token permettra au Backend de l'identifier.
+            // Sinon, on passe joueurId (par défaut 1 pour invité, ou autre logique) si besoin.
+            var response = await _client.PostAsync($"api/game/start?joueurId={joueurId}", null);
+            if (!response.IsSuccessStatusCode)
+            {
+                message = $"Erreur au démarrage : {response.StatusCode}";
+                return;
+            }
+
+            // Désérialisation de la réponse JSON (GameState) pour mettre à jour l'interface.
+            state = await response.Content.ReadFromJsonAsync<GameState>();
+        }
+        catch (Exception ex)
+        {
+            message = $"Exception au démarrage : {ex.Message}";
+        }
+    }
+
+    /// <summary>
+    /// Envoie le choix du joueur (ex: "Combattre", "Fuir") au Backend.
+    /// </summary>
+    private async Task EnvoyerChoix(string choix)
+    {
+        if (state is null) return;
+
+        var request = new ChoiceRequest { Choix = choix };
+
+        try
+        {
+            // Envoi de la commande au serveur pour la partie en cours (state.PartieId)
+            var response = await _client.PostAsJsonAsync($"api/game/{state.PartieId}/choice", request);
+            if (!response.IsSuccessStatusCode)
+            {
+                message = $"Erreur : {response.StatusCode}";
+                return;
+            }
+
+            // Récupération du nouvel état du jeu après l'action (PV perdus, score, nouvelle salle, etc.)
+            state = await response.Content.ReadFromJsonAsync<GameState>();
+        }
+        catch (Exception ex)
+        {
+            message = $"Erreur lors de l'envoi du choix : {ex.Message}";
+        }
+    }
+
+    private string GetRoomClass(RoomType? type)
+    {
+        return type switch
+        {
+            RoomType.Enemy => "room-enemy",
+            RoomType.Chest => "room-chest",
+            RoomType.Trap => "room-trap",
+            RoomType.Puzzle => "room-puzzle",
+            RoomType.Empty => "room-empty",
+            _ => ""
+        };
+    }
+
+    private string GetRoomEmoji(RoomType type)
+    {
+        return type switch
+        {
+            RoomType.Enemy => "👹",
+            RoomType.Chest => "💎",
+            RoomType.Trap => "🕸️",
+            RoomType.Puzzle => "🧩",
+            RoomType.Empty => "🌑",
+            _ => "❓"
+        };
+    }
+}

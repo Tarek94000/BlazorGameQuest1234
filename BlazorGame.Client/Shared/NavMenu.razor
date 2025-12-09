@@ -1,0 +1,21 @@
+<NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+    <span class="oi oi-home" aria-hidden="true"></span> Accueil
+</NavLink>
+
+<NavLink class="nav-link" href="historique">
+    <span class="oi oi-list" aria-hidden="true"></span> Mon historique
+</NavLink>
+
+<NavLink class="nav-link" href="classement">
+    <span class="oi oi-bar-chart" aria-hidden="true"></span> Classement
+</NavLink>
+
+<AuthorizeView Roles="admin">
+    <Authorized>
+        <NavLink class="nav-link" href="admin">
+            <span class="oi oi-dashboard" aria-hidden="true"></span> Admin
+        </NavLink>
+    </Authorized>
+</AuthorizeView>
+
+
