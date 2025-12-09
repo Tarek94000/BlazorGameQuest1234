@@ -5,39 +5,48 @@
 <div class="rules-container">
     <h1>Règles du Jeu</h1>
 
-    <div class="card rule-card">
-        <div class="card-body">
-            <h3>📜 Objectif</h3>
-            <p>Survivre à travers une série de salles dangereuses et accumuler le meilleur score possible.</p>
-        </div>
+    <div class="rules-content mt-4">
+        <h4>🎯 Objectif</h4>
+        <p>Explorer un donjon généré aléatoirement, survivre et obtenir le meilleur score.</p>
+
+        <h4>🎲 Génération du Donjon</h4>
+        <ul>
+            <li>Chaque partie génère un donjon aléatoire.</li>
+            <li>Contient entre <b>1 et 5 salles</b>.</li>
+            <li>Chaque salle possède : un type, une description, une difficulté, des points gagnés/perdus.</li>
+        </ul>
+
+        <h4>🧱 Types de Salles</h4>
+        <ul>
+            <li><b>Ennemi</b> : combat risqué mais potentiellement très rentable.</li>
+            <li><b>Coffre</b> : trésor ou piège.</li>
+            <li><b>Piège</b> : danger direct.</li>
+            <li><b>Énigme</b> : issue incertaine.</li>
+            <li><b>Vide</b> : apparemment sans danger.</li>
+        </ul>
+
+        <h4>🎮 Actions</h4>
+        <ul>
+            <li><b>Combattre</b> : gros gain ou grosse perte selon réussite.</li>
+            <li><b>Fuir</b> : sûr mais peu de points.</li>
+            <li><b>Fouiller</b> : chance de trésor ou de piège.</li>
+        </ul>
+
+        <h4>📈 Score</h4>
+        <ul>
+            <li>Chaque action modifie le <b>score courant</b>.</li>
+            <li>Score ≤ 0 : <b>mort immédiate</b>.</li>
+            <li>Fin de partie = score final enregistré.</li>
+        </ul>
+
+        <h4>🏁 Fin de Partie</h4>
+        <ul>
+            <li>Vous avez traversé toutes les salles du donjon.</li>
+            <li>Ou vous êtes mort.</li>
+        </ul>
     </div>
 
-    <div class="card rule-card">
-        <div class="card-body">
-            <h3>⚔️ Déroulement (V1)</h3>
-            <ul>
-                <li>Une aventure se compose de <strong>5 salles maximum</strong>.</li>
-                <li>Dans chaque salle, vous devez faire un choix :
-                    <ul>
-                        <li><strong>Combattre</strong> : Affrontez le danger pour gagner des points.</li>
-                        <li><strong>Fouiller</strong> : Cherchez des trésors (ou des pièges !).</li>
-                        <li><strong>Fuir</strong> : Évitez le risque, mais ne gagnez rien.</li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="card rule-card">
-        <div class="card-body">
-            <h3>ℹ️ Notes de version</h3>
-            <ul>
-                <li>Les effets de score avancés seront ajoutés dans la version V2.</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="mt-4">
+    <div class="mt-5">
         <a href="/play" class="btn btn-primary btn-lg">🎮 Lancer une aventure</a>
         <a href="/" class="btn btn-secondary btn-lg ms-2">🏠 Retour à l'accueil</a>
     </div>
@@ -49,12 +58,15 @@
         margin: 0 auto;
         padding: 2rem;
     }
-    .rule-card {
-        margin-bottom: 1.5rem;
-        background-color: rgba(255, 255, 255, 0.05); /* Semi-transparent background for dark mode usually */
-        border: 1px solid rgba(255, 255, 255, 0.1);
+    .rules-content h4 {
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+        color: #ffc107; /* Gold color to match theme */
     }
-    .rule-card h3 {
-        color: #ffc107; /* Gold color for headers */
+    .rules-content ul {
+        margin-bottom: 1.5rem;
+    }
+    .rules-content p {
+        margin-bottom: 1.5rem;
     }
 </style>
