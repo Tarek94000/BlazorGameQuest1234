@@ -105,14 +105,14 @@ Le projet est développé en 5 versions successives.
 ## ✅ Version 5 – Authentification & Sécurité (Keycloak)  
 ### 📌 Réalisations  
 - Installation et configuration de Keycloak  
-- Création des rôles : **user**, **admin**  
+- Création des rôles : **joueur**, **admin**  
 - Sécurisation des endpoints :  
   - actions admin → rôle *admin*  
-  - historique joueur → rôle *user*  
+  - historique joueur → rôle *joueur*  
   - actions de jeu → joueur connecté  
 - Intégration du login dans Blazor  
 - Récupération du token dans les appels API  
-- Redirection automatique si non authentifié  
+- Possibilité de jouer en tant qu'invité mais fonctionnalités restreintes
 
 ---
 
@@ -176,7 +176,7 @@ dotnet run --project BlazorGame.Client
 - Authentification via Keycloak  
 - Token JWT utilisé dans les appels API  
 - Rôles utilisés pour limiter l’accès :
-  - user → jouer, voir l’historique  
+  - joueur → jouer, voir l’historique  
   - admin → dashboard complet  
 
 ---
